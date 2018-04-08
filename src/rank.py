@@ -29,7 +29,8 @@ class RankItem:
 
 class Rank:
 
-    def __init__(self, size):
+    def __init__(self, name, size):
+        self._name = name
         self._size = size
         self._list: List[RankItem] = []
 
@@ -63,6 +64,10 @@ class Rank:
     def _clean(self):
         if len(self._list) > self._size:
             self._list = self._list[:self._size]
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     @property
     def ranked_contents(self) -> List:
