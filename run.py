@@ -167,6 +167,10 @@ def range_post_parsing(ns):
 # namespace
 ns = parser.parse_args()
 
+# no command case
+if not ns.command:
+    parser.error('No command was passed. Call <<python run.py -h>> for help.')
+
 # echo
 if ns.debug:
     print(50 * '.')
