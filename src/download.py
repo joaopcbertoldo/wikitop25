@@ -1,3 +1,4 @@
+import os.path
 from datetime import datetime
 
 from src.configs import Defaults as defaults
@@ -12,4 +13,4 @@ def create_url(dt: datetime) -> str:
 
 dt = datetime(year=2017, month=3, day=1, hour=0)
 
-
+os.path.isdir()

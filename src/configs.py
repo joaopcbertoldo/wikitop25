@@ -1,3 +1,18 @@
+import os.path
+import re
+
+
+# find the project's absolute path
+abs_path = os.path.abspath('.')
+pattern = re.compile(r"(.)*\\wikitop25\\")
+result = re.match(pattern, abs_path)
+wikitop25_abs_path = result.group()
+
+
+class Environment:
+    wikitop25_abs_path = wikitop25_abs_path
+
+
 class Defaults:
     date_format = "%Y-%m-%d"
     date_format_h = "YYYY-MM-DD"
