@@ -2,7 +2,7 @@ import argparse
 import datetime as dt_module
 from datetime import datetime, time
 
-import src.defaults as defaults
+from src.configs import Defaults as defaults
 from src.main import main
 
 
