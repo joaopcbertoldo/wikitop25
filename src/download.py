@@ -2,7 +2,6 @@ import os
 import requests
 from datetime import datetime
 
-from src.configs import Defaults as defaults
 from src.configs import Templates as tmpl
 from src.configs import Environment as env
 
@@ -11,8 +10,6 @@ temp_exists = os.path.isdir(env.temp_abs_path)
 
 if not temp_exists:
     os.makedirs(env.temp_abs_path)
-
-
 
 
 def create_url(dt: datetime) -> str:
