@@ -4,13 +4,14 @@ import re
 
 # find the project's absolute path
 abs_path = os.path.abspath('.')
-pattern = re.compile(r"(.)*\\wikitop25\\")
+pattern = re.compile(r'(.)*\\wikitop25\\')
 result = re.match(pattern, abs_path)
 wikitop25_abs_path = result.group()
 
 
 class Environment:
     wikitop25_abs_path = wikitop25_abs_path
+    temp_abs_path = wikitop25_abs_path + r'temp\\'
 
 
 class Defaults:
