@@ -2,10 +2,10 @@ import os.path
 import pickle
 from typing import Dict
 
-# text filename
+# text name
 tfname = 'blacklist_domains_and_pages'
 
-# pickle filename
+# pickle name
 pfname = 'black_list_dict.pickle'
 
 
@@ -41,3 +41,7 @@ def load() -> Dict[str, str]:
         with open(pfname, 'wb') as f:
             pickle.dump(black_list_dict, f)
     return black_list_dict
+
+
+if __name__ == '__main__':
+    load()
