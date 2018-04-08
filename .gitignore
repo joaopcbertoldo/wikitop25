@@ -1,3 +1,7 @@
+# black list files
+src/black_list/black_list_dict.pickle
+src/black_list/blacklist_domains_and_pages
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
