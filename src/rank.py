@@ -45,14 +45,14 @@ class Rank:
             size = min(max_size, list_len)
 
             last_item = self._list[size - 1]
-            if size == max_size and score <= last_item:
+            if size == max_size and score < last_item:
                 return
             else:
                 range_ = list(reversed(range(size)))
                 for i in range_:
                     item = self._list[i]
                     # draw ??
-                    if score <= item:
+                    if score < item:
                         break
                 if i == 0 and score > item:
                     i = -1

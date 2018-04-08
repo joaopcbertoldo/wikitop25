@@ -1,11 +1,11 @@
 import os.path
 import pickle
-from typing import Dict
+from typing import Dict, List
 
 from src.configs import Environment as env
 
 
-def load() -> Dict[str, str]:
+def load() -> Dict[str, List[str]]:
 
     # check if the pickle exists
     exists = os.path.isfile(env.black_list_pickle_path)
