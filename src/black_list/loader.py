@@ -12,10 +12,13 @@ pfname = 'black_list_dict.pickle'
 def load() -> Dict[str, str]:
     global tfname, pfname
 
-    # check if it exists
+    # check if the pickle exists
     exists = os.path.isfile(pfname)
 
     if exists:
+        # check if the original exists
+        assert os.path.isfile(tfname), f"The file '{tfname}' should be put in the folder '{os.path.abspath('.')}'."
+
         with open(pfname, 'rb') as f:
             black_list_dict = pickle.load(f)
 
