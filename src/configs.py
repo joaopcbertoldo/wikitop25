@@ -1,11 +1,11 @@
-import os.path
 import re
+import sys
 
 
 # find the project's absolute path
-abs_path = os.path.abspath('.')
+configs_path = sys.modules[__name__].__file__
 pattern = re.compile(r'(.)*\\wikitop25\\')
-result = re.match(pattern, abs_path)
+result = re.match(pattern, configs_path)
 wikitop25_abs_path = result.group()
 
 
