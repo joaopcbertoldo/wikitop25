@@ -2,28 +2,24 @@ import os.path
 import pickle
 from typing import Dict
 
-# text name
-tfname = 'blacklist_domains_and_pages'
-
-# pickle name
-pfname = 'black_list_dict.pickle'
+from src.configs import Environment as env
 
 
 def load() -> Dict[str, str]:
-    global tfname, pfname
 
     # check if the pickle exists
-    exists = os.path.isfile(pfname)
+    exists = os.path.isfile(env.black_list_pickle_path)
 
     if exists:
-        # check if the original exists
-        assert os.path.isfile(tfname), f"The file '{tfname}' should be put in the folder '{os.path.abspath('.')}'."
-
-        with open(pfname, 'rb') as f:
+        with open(env.black_list_pickle_path, 'rb') as f:
             black_list_dict = pickle.load(f)
 
     else:
-        with open(tfname, encoding='utf-8') as f:
+        # check if the original exists
+        assert os.path.isfile(env.black_list_original_path), \
+            f"The file '{env.black_list_original_name}' should be put in the folder '{env.black_list_folder}'."
+
+        with open(env.black_list_original_path, encoding='utf-8') as f:
             lines = f.readlines()
 
         black_list_dict = {}
@@ -38,8 +34,9 @@ def load() -> Dict[str, str]:
                 black_list_dict[domain] = []
             black_list_dict[domain].append(page)
 
-        with open(pfname, 'wb') as f:
+        with open(env.black_list_pickle_path, 'wb') as f:
             pickle.dump(black_list_dict, f)
+
     return black_list_dict
 
 

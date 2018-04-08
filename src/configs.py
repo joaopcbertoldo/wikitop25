@@ -13,6 +13,14 @@ class Environment:
     wikitop25_abs_path = wikitop25_abs_path
     temp_abs_path = wikitop25_abs_path + r'temp\\'
 
+    black_list_folder = wikitop25_abs_path + r'src\\black_list\\'
+
+    black_list_original_name = 'blacklist_domains_and_pages'
+    black_list_original_path = black_list_folder + black_list_original_name
+
+    black_list_pickle_name = 'black_list_dict.pickle'
+    black_list_pickle_path = black_list_folder + black_list_pickle_name
+
 
 class Defaults:
     date_format = "%Y-%m-%d"
