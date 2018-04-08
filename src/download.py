@@ -33,7 +33,7 @@ class TempFile:
         return exists
 
 
-def download_pageviews(dt: datetime):
+def download_pageviews(dt: datetime) -> str:
     """..."""
     tfile = TempFile(dt)
 
@@ -44,6 +44,8 @@ def download_pageviews(dt: datetime):
         with open(tfile.path, "wb") as f:
             r = requests.get(tfile.url)
             f.write(r.content)
+
+    return tfile.path
 
 
 def delete_temp(dt: datetime):
