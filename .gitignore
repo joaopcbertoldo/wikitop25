@@ -2,6 +2,9 @@
 src/black_list/black_list_dict.pickle
 src/black_list/blacklist_domains_and_pages
 
+# temp files
+temp/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
