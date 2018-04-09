@@ -100,6 +100,7 @@ class ComputeRankTask(luigi.Task):
 
     # run
     def run(self):
+        # todo test del bl
         pass
 
     # output
