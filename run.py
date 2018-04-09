@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+This module manages the command line that calls the application and parses the inputs.
+
+It is a separation layer from the application, passing to it uniquely valid inputs.
+"""
+
 import argparse
 import datetime as dt_module
 from datetime import datetime, time
@@ -5,6 +12,8 @@ from datetime import datetime, time
 from src.configs import Defaults as defaults
 from src.main import main
 
+
+# ------------------------------------------------- aux ----------------------------------------------------------------
 
 # validate the date input
 def valid_date(s: str):
