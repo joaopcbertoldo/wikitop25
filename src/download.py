@@ -9,6 +9,7 @@ from datetime import datetime
 
 import luigi
 from luigi import format
+from luigi.target import Target
 
 from src.configs import Environment as env
 
@@ -85,7 +86,7 @@ class DownloadTask(luigi.Task):
             f.write(txt)
 
     # output
-    def output(self):
+    def output(self) -> Target:
         # abspath
         abspath = self._filemeta.abspath
 

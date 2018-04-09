@@ -8,11 +8,12 @@ from typing import List, Dict
 from datetime import datetime
 
 import luigi
+from luigi.target import Target
 from tqdm import tqdm
 
 from src.rank import Rank
 from src.configs import Defaults as defaults
-from src.black_list import loader as black_list
+from src.black_list import BlackList
 from src.download import DownloadTask
 
 
@@ -104,7 +105,7 @@ class ComputeRankTask(luigi.Task):
         pass
 
     # output
-    def output(self):
+    def output(self) -> Target:
         pass
 
 
