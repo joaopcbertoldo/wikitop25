@@ -86,8 +86,11 @@ def rank_by_domain(to_be_ranked_by_domain: Dict[str, List]) -> Dict[str, Rank]:
     return ranks
 
 
-if __name__ == '__main__':
+def _test():
+    dt1 = datetime(year=2017, month=3, day=1, hour=0)
 
-    dt = datetime(year=2017, month=3, day=1, hour=0)
-    #c = extract_content(dt)
+
+if __name__ == '__main__':
+    _test()
+    pass
 
