@@ -100,7 +100,6 @@ class ComputeRankTask(luigi.Task):
 
     # run
     def run(self):
-        print(self.input().exists())
         pass
 
     # output
