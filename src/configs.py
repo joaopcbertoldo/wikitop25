@@ -48,8 +48,3 @@ class Defaults:
     date_hour_format = "%Y-%m-%d at %Hh"
 
     rank_size = 25
-
-
-class Templates:
-    pageviews_url = 'https://dumps.wikimedia.org/other/pageviews/%Y/%Y-%m/pageviews-%Y%m%d-%H0000.gz'
-
