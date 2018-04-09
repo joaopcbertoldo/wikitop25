@@ -1,8 +1,15 @@
+# -*- coding: utf-8 -*-
+"""
+Configurations of the application.
+    Environment configs (folders, files, paths)
+    Defaults (date/hour formats, rank size)
+"""
+
 import re
 import sys
 
 
-# ------------------------------------ find the project's absolute abspath ------------------------------------
+# ---------------------------------------- find the project's absolute abspath -----------------------------------------
 # get this module's abspath
 configs_path = sys.modules[__name__].__file__
 
@@ -15,6 +22,11 @@ wikitop25_abs_path = re.match(pattern, configs_path).group()
 
 # environment
 class Environment:
+    """
+    Environment configurations.
+        Temp folders absolute paths.
+        Black list folder/files absolute paths.
+    """
 
     # project's abspath
     wikitop25_abs_path = wikitop25_abs_path
@@ -37,14 +49,28 @@ class Environment:
     black_list_pickle_path = black_list_folder + black_list_pickle_name
 
 
+# Defaults
 class Defaults:
+    """
+    Defaults of the application.
+        date format --> parsed format, example, datetime formatter
+        hour format --> parsed format, example
+        date hour format --> datetime formatter
+
+        rank size
+    """
+
+    # date format (datetime, human readable, example)
     date_format = "%Y-%m-%d"
     date_format_h = "YYYY-MM-DD"
     date_format_ex = "2018-04-08"
 
+    # hour format (human readable, example)
     hour_format_h = "hh (24h)"
     hour_format_ex = "20"
 
+    # date hour format (datetime)
     date_hour_format = "%Y-%m-%d at %Hh"
 
+    # rank size
     rank_size = 25

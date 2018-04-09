@@ -1,10 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+
+"""
+
 import gzip
 from typing import List, Dict
 from datetime import datetime
 from tqdm import tqdm
 
 from src.black_list import loader as bl
-from src.download import download_pageviews
 from src.rank import Rank
 from src.configs import Defaults as defaults
 

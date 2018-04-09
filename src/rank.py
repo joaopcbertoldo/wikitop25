@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+
+"""
+
 from typing import List, Tuple, Callable, Union
 from numbers import Number
 
