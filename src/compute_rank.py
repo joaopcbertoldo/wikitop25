@@ -6,11 +6,14 @@
 import gzip
 from typing import List, Dict
 from datetime import datetime
+
+import luigi
 from tqdm import tqdm
 
-from src.black_list import loader as bl
 from src.rank import Rank
 from src.configs import Defaults as defaults
+from src.black_list import loader as black_list
+from src.download import DownloadTask
 
 
 def _transform(line: bytes) -> List:
@@ -46,7 +49,7 @@ def sort_by_domain(content: List[List[str]]) -> Dict[str, List]:
 
 
 def apply_black_list_filter(to_be_ranked_by_domain: Dict[str, List]):
-    black_list = bl.load()
+    black_list = black_list.load()
 
     for domain in black_list:
         to_be_ranked = to_be_ranked_by_domain.get(domain, None)
@@ -86,8 +89,39 @@ def rank_by_domain(to_be_ranked_by_domain: Dict[str, List]) -> Dict[str, Rank]:
     return ranks
 
 
+class ComputeRankTask(luigi.Task):
+
+    # date hour parameter
+    date_hour = luigi.DateHourParameter()
+
+    # requires
+    def requires(self):
+        return DownloadTask(self.date_hour)
+
+    # run
+    def run(self):
+        print(self.input().exists())
+        pass
+
+    # output
+    def output(self):
+        pass
+
+
 def _test():
+    # date-hour's
     dt1 = datetime(year=2017, month=3, day=1, hour=0)
+    dt1p = datetime(year=2017, month=3, day=1, hour=1)
+
+    # tasks
+    t1 = ComputeRankTask(dt1)
+    t1p = ComputeRankTask(dt1p)
+
+    # gather tasks
+    tasks = [t1, t1p]
+
+    # build
+    luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=True)
 
 
 if __name__ == '__main__':
