@@ -3,7 +3,10 @@ import os
 from src.configs import Environment as env
 
 
+# ensure folder
 def _ensure_folder(abs_path):
+    """"""
+
     # check existence
     exists = os.path.isdir(abs_path)
 
@@ -12,7 +15,10 @@ def _ensure_folder(abs_path):
         os.makedirs(abs_path)
 
 
+# setup temp
 def setup_temp():
+    """"""
+
     # temp folder
     _ensure_folder(env.temp_abs_path)
 
