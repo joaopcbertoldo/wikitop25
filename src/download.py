@@ -6,15 +6,20 @@ from src.configs import Templates as tmpl
 from src.configs import Environment as env
 
 
-
 def create_url(dt: datetime) -> str:
     """Create the wikipedia url to download the pageviews for the given datetime."""
+
+    # get the template
     template = tmpl.pageviews_url
+
+    # replace values
     url = dt.strftime(template)
+
+    # ret
     return url
 
 
-class TempFile:
+class DownloadTempFileMeta:
 
     def __init__(self, dt: datetime):
         self.dt: datetime = dt
@@ -28,33 +33,40 @@ class TempFile:
         return exists
 
 
-def download_pageviews(dt: datetime) -> str:
-    """..."""
-    tfile = TempFile(dt)
+def download_pageviews_job(url: str, file_path: str):
+    # open file
+    with open(file_path, "wb") as f:
 
-    if tfile.exists:
+        # get the info from internet
+        r = requests.get(url)
+
+        # write it in the file
+        f.write(r.content)
+
+
+def download_pageviews(meta: DownloadTempFileMeta):
+    """..."""
+
+    if meta.exists:
+        pass
+    else:
+        download_pageviews_job(meta.url, meta.path)
+
+
+def delete_job(file_path: str):
+    os.remove(file_path)
+
+
+def delete_temp(meta: DownloadTempFileMeta):
+    """..."""
+    if meta.exists:
+        delete_job(meta.path)
+    else:
         pass
 
-    else:
-        with open(tfile.path, "wb") as f:
-            r = requests.get(tfile.url)
-            f.write(r.content)
 
-    return tfile.path
-
-
-def delete_temp(dt: datetime):
-    """..."""
-    tfile = TempFile(dt)
-
-    if tfile.exists:
-        os.remove(tfile.path)
-    else:
-        pass
-
-
-# test
-if __name__ == '__main__':
+# tests
+def _tests():
     import time
 
     print('testing...')
@@ -76,3 +88,8 @@ if __name__ == '__main__':
     print('deleting')
     delete_temp(dt)
     print('list dir = ', os.listdir(dir))
+
+
+# test
+if __name__ == '__main__':
+    # _tests()
