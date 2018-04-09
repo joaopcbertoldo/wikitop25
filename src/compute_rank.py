@@ -69,7 +69,7 @@ def apply_black_list_filter(to_be_ranked_by_domain: Dict[str, List]):
 def rank_by_domain(to_be_ranked_by_domain: Dict[str, List]) -> Dict[str, Rank]:
     ranks = {}
     for domain in tqdm(to_be_ranked_by_domain.keys()):
-        r = Rank(name=domain, size=defaults.rank_size)
+        r = Rank(name=domain, maxlen=defaults.rank_size)
         pages = to_be_ranked_by_domain[domain]
 
         for page in pages:
@@ -77,7 +77,7 @@ def rank_by_domain(to_be_ranked_by_domain: Dict[str, List]) -> Dict[str, Rank]:
             score = page[1]
             r.push(content=name, score=score)
 
-        ranks[domain] = r.ranked_tuples
+        ranks[domain] = r.tuples
 
     return ranks
 
