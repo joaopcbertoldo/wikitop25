@@ -6,11 +6,6 @@ from src.configs import Templates as tmpl
 from src.configs import Environment as env
 
 
-temp_exists = os.path.isdir(env.temp_abs_path)
-
-if not temp_exists:
-    os.makedirs(env.temp_abs_path)
-
 
 def create_url(dt: datetime) -> str:
     """Create the wikipedia url to download the pageviews for the given datetime."""
