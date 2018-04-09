@@ -31,7 +31,7 @@ class DownloadTempFileMeta:
         self.dt: datetime = dt
         self.url: str = create_url(self.dt)
         self.name: str = self.url.split("/")[-1]
-        self.path: str = env.temp_download_abs_path + self.name
+        self.path: str = env.temp_download_abs_path + self.name + '.txt'
 
     @property
     def exists(self) -> bool:
@@ -97,9 +97,12 @@ class DownloadTask(luigi.Task):
         # text
         txt = bytes_.decode('utf-8')
 
+        f = self.output().open('w')
+        f.write(txt)
+        f.close
         # open file
-        with self.output().open("w") as f:
-            f.write(txt)
+        #with self.output().open("w") as f:
+         #   f.write(txt)
 
         """
         from clint.textui import progress
@@ -118,7 +121,7 @@ class DownloadTask(luigi.Task):
         # path
         path = self._filemeta.path
         # target
-        target = luigi.LocalTarget(path, format=format.TextFormat)
+        target = luigi.LocalTarget(path, format=format.UTF8)
         return target
 
 
