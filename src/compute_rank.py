@@ -105,12 +105,34 @@ class ComputeRankTask(luigi.Task):
     def run(self):
         if self.output().exists():
             return
+
+        bl = BlackList()
+
+        ranks = {}
+
+        with self.input().open('r') as f:
+            iter = tqdm(f) if __name__ == '__main__' else f
+            for line in iter:
+                domain, page, pageviews, _ = tuple(line.split())
+
+                rank = ranks.get(domain, None)
+
+                if rank is None:
+                    rank = Rank(name=domain, maxlen=defaults.augmented_rank_size, validate_fun=None)
+
+                rank.push(page, pageviews)
         pass
+
 
     # output
     def output(self) -> Target:
+        # filename
         filename = self.date_hour.strftime(defaults.date_hour_format)
+
+        # abs path
         abspath = env.temp_rank_pickle_abs_path + filename
+
+        # target
         target = luigi.LocalTarget(abspath, format=format.Nop)
         return target
 

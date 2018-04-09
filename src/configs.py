@@ -78,3 +78,6 @@ class Defaults:
 
     # rank size
     rank_size = 25
+    # augmented rank size (todo explain)
+    augmented_rank_size = 50
+
