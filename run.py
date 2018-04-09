@@ -89,8 +89,8 @@ def single_post_parsing(ns):
 
     # dt before now
     if not ns.dt <= dtnow:
-        nowstr = dtnow.strftime(defaults.date_hour_format)
-        dtstr = ns.dt.strftime(defaults.date_hour_format)
+        nowstr = dtnow.strftime(defaults.date_hour_format_h)
+        dtstr = ns.dt.strftime(defaults.date_hour_format_h)
         err_msg = f"The instant to process must be before or equal to the current time ({nowstr}). "
         err_msg += f"\n\tGiven: {dtstr}"
         range_parser.error(err_msg)
@@ -138,8 +138,8 @@ def range_post_parsing(ns):
 
     # end after begining
     if not ns.dtN > ns.dt0:
-        dt0str = ns.dt0.strftime(defaults.date_hour_format)
-        dtNstr = ns.dtN.strftime(defaults.date_hour_format)
+        dt0str = ns.dt0.strftime(defaults.date_hour_format_h)
+        dtNstr = ns.dtN.strftime(defaults.date_hour_format_h)
         err_msg = "The end must be after than the beginning."
         err_msg += "\n\tGiven: \n"
         err_msg += f"\t\tbegining = {dt0str} \n"
@@ -151,8 +151,8 @@ def range_post_parsing(ns):
 
     # end before now
     if not ns.dtN <= dtnow:
-        nowstr = dtnow.strftime(defaults.date_hour_format)
-        dtNstr = ns.dtN.strftime(defaults.date_hour_format)
+        nowstr = dtnow.strftime(defaults.date_hour_format_h)
+        dtNstr = ns.dtN.strftime(defaults.date_hour_format_h)
         err_msg = f"The end must be before or equal to the current time ({nowstr}). "
         err_msg += "\n\tGiven: \n"
         err_msg += f"\t\tend = {dtNstr}"

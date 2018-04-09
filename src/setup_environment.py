@@ -30,3 +30,6 @@ def setup_temp():
 
     # temp download folder
     _ensure_folder(env.temp_download_abs_path)
+
+    # temp rank pickle
+    _ensure_folder(env.temp_rank_pickle_abs_path)

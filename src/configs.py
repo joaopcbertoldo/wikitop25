@@ -37,6 +37,9 @@ class Environment:
     # abspath of the temp\download folder
     temp_download_abs_path = temp_abs_path + r'download\\'
 
+    # abspath of temp\rank_pickle folder
+    temp_rank_pickle_abs_path = temp_abs_path + r'rank_pickle\\'
+
     # black list folder
     black_list_folder = wikitop25_abs_path + r'src\\black_list\\'
 
@@ -70,7 +73,8 @@ class Defaults:
     hour_format_ex = "20"
 
     # date hour format (datetime)
-    date_hour_format = "%Y-%m-%d at %Hh"
+    date_hour_format = "%Y-%m-%d-%HH"
+    date_hour_format_h = "%Y-%m-%d at %Hh"
 
     # rank size
     rank_size = 25

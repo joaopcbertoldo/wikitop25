@@ -9,10 +9,12 @@ from datetime import datetime
 
 import luigi
 from luigi.target import Target
+from luigi import format
 from tqdm import tqdm
 
 from src.rank import Rank
 from src.configs import Defaults as defaults
+from src.configs import Environment as env
 from src.black_list import BlackList
 from src.download import DownloadTask
 
@@ -101,12 +103,16 @@ class ComputeRankTask(luigi.Task):
 
     # run
     def run(self):
-        # todo test del bl
+        if self.output().exists():
+            return
         pass
 
     # output
     def output(self) -> Target:
-        pass
+        filename = self.date_hour.strftime(defaults.date_hour_format)
+        abspath = env.temp_rank_pickle_abs_path + filename
+        target = luigi.LocalTarget(abspath, format=format.Nop)
+        return target
 
 
 def _test():
