@@ -1,6 +1,5 @@
-import os
+import gzip
 import requests
-import zlib
 from datetime import datetime
 
 import luigi
@@ -9,166 +8,107 @@ from luigi import format
 from src.configs import Environment as env
 
 
+# template url for wikipedia's api
 pageviews_url_template = 'https://dumps.wikimedia.org/other/pageviews/%Y/%Y-%m/pageviews-%Y%m%d-%H0000.gz'
 
 
+# create url
 def create_url(dt: datetime) -> str:
     """Create the wikipedia url to download the pageviews for the given datetime."""
 
-    # get the template
-    template = pageviews_url_template
-
-    # replace values
-    url = dt.strftime(template)
+    # replace values in the template
+    url = dt.strftime(pageviews_url_template)
 
     # ret
     return url
 
 
-class DownloadTempFileMeta:
+# Download Target Meta Data
+class DownloadTargetMetaData:
+    """"""
 
     def __init__(self, dt: datetime):
+        """dt is the date time containing the date and hour of the rank to be computed."""
+        # datetime
         self.dt: datetime = dt
+
+        # url (to the pageviews)
         self.url: str = create_url(self.dt)
+
+        # name of the downloaded file
         self.name: str = self.url.split("/")[-1]
-        self.path: str = env.temp_download_abs_path + self.name + '.txt'
 
-    @property
-    def exists(self) -> bool:
-        exists = os.path.isfile(self.path)
-        return exists
-
-
-# for test purposes
-def download_pageviews_job(url: str, file_path):
-    # open file
-    with open(file_path, "wb") as f:
-
-        # get the info from internet
-        r = requests.get(url)
-
-        # write it in the file
-        f.write(r.content)
-
-
-# for test purposes
-def download_pageviews(meta: DownloadTempFileMeta):
-    """..."""
-
-    if meta.exists:
-        pass
-    else:
-        download_pageviews_job(meta.url, meta.path)
-
-
-# for test purposes
-def delete_job(file_path: str):
-    os.remove(file_path)
-
-
-# for test purposes
-def delete_temp(meta: DownloadTempFileMeta):
-    """..."""
-    if meta.exists:
-        delete_job(meta.path)
-    else:
-        pass
+        # abs abspath of the downloaded file
+        self.abspath: str = env.temp_download_abs_path + self.name + '.txt'
 
 
 # task
 class DownloadTask(luigi.Task):
+    """Task that downloads a pageview gz file, reads it and saves it in txt."""
 
     # date hour parameter
     date_hour = luigi.DateHourParameter()
 
+    # init
     def __init__(self, *args, **kwargs):
         luigi.Task.__init__(self, *args, **kwargs)
 
-        self._filemeta = DownloadTempFileMeta(self.date_hour)
+        # the metadata
+        self._filemeta = DownloadTargetMetaData(self.date_hour)
 
+    # run
     def run(self):
+
+        # check existence of the target
+        if self.output().exists():
+            return
 
         # get the info from internet
         response = requests.get(self._filemeta.url)
 
-        # decompressed content
-        bytes_ = zlib.decompress(response.content, 15 + 32)
+        # TODO react to responses non 200 ???
 
-        # text
-        txt = bytes_.decode('utf-8')
+        # get the content
+        # decompress it (from gz)
+        # decode the bytes in utf-8 (str as result)
+        txt = gzip.decompress(response.content).decode('utf-8')
 
-        f = self.output().open('w')
-        f.write(txt)
-        f.close
-        # open file
-        #with self.output().open("w") as f:
-         #   f.write(txt)
+        # open txt file
+        with self.output().open("w") as f:
 
-        """
-        from clint.textui import progress
+            # write to it
+            f.write(txt)
 
-        r = requests.get(url, stream=True)
-        path = '/some/path/for/file.txt'
-        with open(path, 'wb') as f:
-            total_length = int(r.headers.get('content-length'))
-            for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1): 
-                if chunk:
-                    f.write(chunk)
-                    f.flush()
-        """
-
+    # output
     def output(self):
-        # path
-        path = self._filemeta.path
-        # target
-        target = luigi.LocalTarget(path, format=format.UTF8)
+        # abspath
+        abspath = self._filemeta.abspath
+
+        # target (format UTF8 !!!)
+        target = luigi.LocalTarget(abspath, format=format.UTF8)
+
+        # ret
         return target
 
 
+# test
 def _test_task():
+    # get two dates
     dt1 = datetime(year=2017, month=3, day=1, hour=0)
-    dt2 = datetime.now()
+    dt2 = datetime(year=2018, month=3, day=18, hour=12)
 
+    # create the tasks
     t1 = DownloadTask(dt1)
-    print('t1 created')
-
     t2 = DownloadTask(dt2)
-    print('t2 created')
 
-    t1.run()
-    print('t1 over')
+    # gather them
+    tasks = [t1, t2]
 
-    # t2.run()
-    print('t2 over')
-
-
-# tests
-def _test_funcs():
-    import time
-
-    print('testing...')
-    dt = datetime(year=2017, month=3, day=1, hour=0)
-    dir = env.temp_abs_path
-
-    print('first call')
-    print('list dir = ', os.listdir(dir))
-    start_time = time.time()
-    download_pageviews(dt)
-    print("--- %s seconds ---" % (time.time() - start_time))
-
-    print('second call')
-    print('list dir = ', os.listdir(dir))
-    start_time = time.time()
-    download_pageviews(dt)
-    print("--- %s seconds ---" % (time.time() - start_time))
-
-    print('deleting')
-    delete_temp(dt)
-    print('list dir = ', os.listdir(dir))
+    # build
+    luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=True)
 
 
 # test
 if __name__ == '__main__':
-    # _test_funcs()
     _test_task()
     pass

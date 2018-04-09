@@ -2,8 +2,8 @@ import re
 import sys
 
 
-# ------------------------------------ find the project's absolute path ------------------------------------
-# get this module's path
+# ------------------------------------ find the project's absolute abspath ------------------------------------
+# get this module's abspath
 configs_path = sys.modules[__name__].__file__
 
 # regex pattern to find everything before the project's name
@@ -16,23 +16,23 @@ wikitop25_abs_path = re.match(pattern, configs_path).group()
 # environment
 class Environment:
 
-    # project's path
+    # project's abspath
     wikitop25_abs_path = wikitop25_abs_path
 
-    # path of the temp folder
+    # abspath of the temp folder
     temp_abs_path = wikitop25_abs_path + r'temp\\'
 
-    # path of the temp\download folder
+    # abspath of the temp\download folder
     temp_download_abs_path = temp_abs_path + r'download\\'
 
     # black list folder
     black_list_folder = wikitop25_abs_path + r'src\\black_list\\'
 
-    # black list original file`s name and path
+    # black list original file`s name and abspath
     black_list_original_name = 'blacklist_domains_and_pages'
     black_list_original_path = black_list_folder + black_list_original_name
 
-    # black list pickle file`s name and path
+    # black list pickle file`s name and abspath
     black_list_pickle_name = 'black_list_dict.pickle'
     black_list_pickle_path = black_list_folder + black_list_pickle_name
 
