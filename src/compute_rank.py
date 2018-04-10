@@ -51,7 +51,7 @@ class ComputeRankTask(luigi.Task):
                 try:
                     # get the infos in the line
                     pieces = line.split()
-                    domain = pieces[1]
+                    domain = pieces[0]
                     page = pieces[1]
                     pageviews = pieces[2]
 
