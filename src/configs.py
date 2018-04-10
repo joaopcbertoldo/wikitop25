@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Configurations of the application.
-    Environment configs (folders, files, paths)
-    Defaults (date/hour formats, rank size)
+configs.py
+    Configurations of the application.
+        Environment configs (folders, files, paths)
+        Defaults values/formats (date/hour formats, rank size, json)
+        Options of behavior.
 """
 
 import re
@@ -20,12 +22,15 @@ pattern = re.compile(r'(.)*\\wikitop25\\')
 wikitop25_abs_path = re.match(pattern, configs_path).group()
 
 
+# --------------------------------------- container classes with the configs -------------------------------------------
+
 # environment
 class Environment:
     """
     Environment configurations.
         Temp folders absolute paths.
         Black list folder/files absolute paths.
+        Rank folder absolute path.
     """
 
     # project's abspath
@@ -59,11 +64,11 @@ class Environment:
 class Defaults:
     """
     Defaults of the application.
-        date format --> parsed format, example, datetime formatter
-        hour format --> parsed format, example
-        date hour format --> datetime formatter
-
-        rank size
+        date format
+        hour format
+        date hour format
+        rank size/augmented rank size
+        json indentation
     """
 
     # date format (datetime, human readable, example)
@@ -75,7 +80,7 @@ class Defaults:
     hour_format_h = "hh (24h)"
     hour_format_ex = "20"
 
-    # date hour format (datetime)
+    # date hour format (datetime, human readable)
     date_hour_format = "%Y-%m-%d-%HH"
     date_hour_format_h = "%Y-%m-%d at %Hh"
 
@@ -83,17 +88,19 @@ class Defaults:
     rank_size = 25
 
     # augmented rank size (size used to build the ranks, to compensate the fact that it is filtered later)
-    augmented_rank_size = 30
+    augmented_rank_size = 50
 
     # json indentation
     json_indentation = 4
 
 
+# Options
 class Options:
+    """Options concerning the application's behavior."""
 
-    # filter main page
+    # filter main page --> whether the Main_Page page should be banned (it is often the top 1 if not)
     filter_main_page = True
 
-    # luigi scheduler
+    # luigi scheduler --> whether to use or not a local scheduler
     use_local_scheduler = False
 

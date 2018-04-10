@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Setups necessary stuff in the application environment (as the temp folders).
-Module called uniquely by the main.
+setup_environment.py
+    Setups necessary conditions of the application environment (as the temp folders).
 """
 
 import os
@@ -22,8 +22,8 @@ def _ensure_folder(abs_path: str):
 
 
 # setup temp
-def setup_temp():
-    """Setup the temp folder and it's subfolders (this means that it ensures their existences)."""
+def _setup_folders():
+    """Setup the necessary folders and their subfolders (this means that it ensures their existences)."""
 
     # temp folder
     _ensure_folder(env.temp_abs_path)
@@ -38,6 +38,16 @@ def setup_temp():
     _ensure_folder(env.ranks_abs_path)
 
 
-# test
+def run():
+    """Run every necessary setup."""
+
+    # for now there is only one function thing to be called, but, as the application changes, there could be other
+    # things, so having one only function to be called keeps the main unchanged.
+
+    # folders
+    _setup_folders()
+
+
+# test purposes...
 if __name__ == '__main__':
-    setup_temp()
+    _setup_folders()

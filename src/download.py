@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-
+download.py
+    Defines the DownloadTask and auxiliary stuff for it.
+    DownloadTask: downloads the gz file from wikimedia (via http request), decompresses it, decodes it in utf-8
+                  and saves the result in a txt file.
 """
 
 import gzip
@@ -31,15 +34,15 @@ def create_url(dt: datetime) -> str:
 
 # Download Target Meta Data
 class DownloadTargetMetaData:
-    """"""
+    """Gathers several practical infos concerning a download target's meta data."""
 
-    def __init__(self, dt: datetime):
-        """dt is the date time containing the date and hour of the rank to be computed."""
-        # datetime
-        self.dt: datetime = dt
+    def __init__(self, dh: datetime):
+        """dh is the date time containing the date and hour of the rank to be computed."""
+        # date-hour
+        self.dh: datetime = dh
 
         # url (to the pageviews)
-        self.url: str = create_url(self.dt)
+        self.url: str = create_url(self.dh)
 
         # name of the downloaded file
         self.name: str = self.url.split("/")[-1]
@@ -59,20 +62,18 @@ class DownloadTask(luigi.Task):
     def __init__(self, *args, **kwargs):
         luigi.Task.__init__(self, *args, **kwargs)
 
-        # the metadata
+        # the metadata of the download's file
         self._filemeta = DownloadTargetMetaData(self.date_hour)
 
     # run
     def run(self):
 
-        # check existence of the target
+        # check existence of the target - for test purposes
         if self.output().exists():
             return
 
         # get the info from internet
         response = requests.get(self._filemeta.url)
-
-        # TODO react to responses non 200 ???
 
         # get the content
         # decompress it (from gz)
@@ -85,19 +86,19 @@ class DownloadTask(luigi.Task):
             # write to it
             f.write(txt)
 
-    # output
+    # output - local target
     def output(self) -> Target:
         # abspath
         abspath = self._filemeta.abspath
 
-        # target (format UTF8 !!!)
+        # target (format UTF8 is important!!!)
         target = luigi.LocalTarget(abspath, format=format.UTF8)
 
         # ret
         return target
 
 
-# test
+# test the task
 def _test_task():
     # get two dates
     dt1 = datetime(year=2017, month=3, day=1, hour=0)
@@ -114,7 +115,7 @@ def _test_task():
     luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=True)
 
 
-# test
+# test purposes
 if __name__ == '__main__':
     _test_task()
     pass
