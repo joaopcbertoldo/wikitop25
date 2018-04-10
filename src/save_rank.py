@@ -2,6 +2,7 @@
 """
 
 """
+import os
 import json
 from typing import Dict
 from datetime import datetime
@@ -35,8 +36,7 @@ class SaveRankTask(luigi.Task):
 
         # load the ranks from the input
         with open(self.input().path, 'rb') as f:
-            ranks = pickle.load(f)
-            #ranks: Dict[str, Rank] = pickle.load(f)
+            ranks: Dict[str, Rank] = pickle.load(f)
 
         # for each domain
         for domain, rank in ranks.items():
@@ -64,15 +64,37 @@ class SaveRankTask(luigi.Task):
         return target
 
 
+# Clean Temp Files Task
+class CleanTempFilesTask(luigi.Task):
+
+    # date hour parameter
+    date_hour = luigi.DateHourParameter()
+
+    # requires
+    def requires(self):
+        return SaveRankTask(self.date_hour)
+
+    # run
+    def run(self):
+        # path to the pickle file
+        picke_abspath = self.requires().input().path
+
+        # path to the pickle file
+        download_abspath = self.requires().requires().input().path
+
+        os.remove(picke_abspath)
+        os.remove(download_abspath)
+
+
 # test
-def _test():
+def _test_save():
     # date-hour's
     dt1 = datetime(year=2017, month=3, day=18, hour=12)
     dt2 = datetime(year=2018, month=3, day=18, hour=12)
 
     # tasks
     t1 = SaveRankTask(dt1)
-    #t2 = SaveRankTask(dt2)
+    # t2 = SaveRankTask(dt2)
 
     # gather tasks
     tasks = [t1]
@@ -82,7 +104,22 @@ def _test():
     luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=True)
 
 
+def _test_cleanup():
+    # date-hour's
+    dt1 = datetime(year=2017, month=3, day=18, hour=12)
+
+    # tasks
+    t1 = CleanTempFilesTask(dt1)
+
+    # gather tasks
+    tasks = [t1]
+
+    # build
+    luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=True)
+
+
 # run the test
 if __name__ == '__main__':
-    _test()
+    # _test_save()
+    _test_cleanup()
     pass
