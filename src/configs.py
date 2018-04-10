@@ -89,3 +89,8 @@ class Defaults:
     json_indentation = 4
 
 
+class Options:
+
+    # filter main page
+    filter_main_page = True
+

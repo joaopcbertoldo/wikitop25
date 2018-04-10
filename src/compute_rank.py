@@ -14,6 +14,7 @@ from tqdm import tqdm
 from src.rank import Rank
 from src.configs import Defaults as defaults
 from src.configs import Environment as env
+from src.configs import Options as opt
 from src.black_list import BlackList
 from src.download import DownloadTask
 
@@ -74,9 +75,19 @@ class ComputeRankTask(luigi.Task):
         for domain, rank in ranks.items():
 
             # the validation func
-            def validate(content):
-                # the black list (of this domain) must not have the content
-                return bl.doesnt_have(domain, content)
+            # in case the main page must be filtered
+            if opt.filter_main_page:
+                # func
+                def validate(content):
+                    # the black list (of this domain) must not have the content
+                    return bl.doesnt_have(domain, content) and content != 'Main_Page'
+
+            # in case it shouldnt
+            else:
+                # func
+                def validate(content):
+                    # the black list (of this domain) must not have the content
+                    return bl.doesnt_have(domain, content)
 
             # post validate the contents
             rank.post_validate(validate_fun=validate)
