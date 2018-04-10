@@ -55,8 +55,12 @@ class BlackList(object):
         # load it
         self._dic = load()
 
+    # doesnt_have
+    def doesnt_have(self, domain, page):
+        return not self.has(domain, page)
+
     # is in
-    def is_in(self, domain, page) -> bool:
+    def has(self, domain, page) -> bool:
 
         # get the domain's black list
         domain_bl = self._dic.get(domain, None)
@@ -95,7 +99,7 @@ def _test():
     # do the tests
     for domain, page in tuples:
         print(f'domain: {domain}, page: {page}')
-        print(bl.is_in(domain, page))
+        print(bl.has(domain, page))
         print()
 
 

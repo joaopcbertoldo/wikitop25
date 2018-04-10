@@ -16,6 +16,9 @@ class RankItem:
     def add_content(self, content):
         self._contents.append(content)
 
+    def remove_content(self, content):
+        self._contents.remove(content)
+
     @property
     def contents(self):
         return self._contents
@@ -48,7 +51,7 @@ class RankItem:
 class Rank:
 
     # init
-    def __init__(self, name: str, maxlen: int, validate_fun: Callable):
+    def __init__(self, name: str, maxlen: int, validate_fun: Callable = None):
         self._name = name
         self._maxlen = maxlen
         self._list: List[RankItem] = []
@@ -175,6 +178,21 @@ class Rank:
 
                 # game over
                 return
+
+    # post validate
+    def post_validate(self, validate_fun):
+        # check every rank item
+        for ri in self._list:
+            # look each content of the rank items
+            for c in ri.contents:
+                # if not valid
+                if not validate_fun(c):
+                    # remove it
+                    ri.remove_content(c)
+
+    def resize(self, newmaxlen: int):
+        self._maxlen = newmaxlen
+        self._clean()
 
     # clean
     def _clean(self):

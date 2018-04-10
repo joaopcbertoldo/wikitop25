@@ -3,11 +3,10 @@
 
 """
 
-import gzip
-from typing import List, Dict
 from datetime import datetime
 
 import luigi
+import pickle
 from luigi.target import Target
 from luigi import format
 from tqdm import tqdm
@@ -19,80 +18,9 @@ from src.black_list import BlackList
 from src.download import DownloadTask
 
 
-def _transform(line: bytes) -> List:
-    return line.decode('utf-8').split()[0:3]
-
-
-def extract_content(dt: datetime) -> List[List[str]]:
-
-    fpath = download_pageviews(dt)
-
-    with gzip.open(fpath, 'rb') as f:
-        content = [_transform(line) for line in f.readlines()]
-
-    return content
-
-
-def sort_by_domain(content: List[List[str]]) -> Dict[str, List]:
-    by_domain = {}
-
-    for element in content:
-        domain = element[0]
-        page = element[1]
-        pageview = int(element[2])
-
-        info = [page, pageview]
-
-        if domain in by_domain:
-            by_domain[domain].append(info)
-        else:
-            by_domain[domain] = [info]
-
-    return by_domain
-
-
-def apply_black_list_filter(to_be_ranked_by_domain: Dict[str, List]):
-    black_list = black_list.load()
-
-    for domain in black_list:
-        to_be_ranked = to_be_ranked_by_domain.get(domain, None)
-        banned_pages = black_list[domain]
-
-        if not to_be_ranked:
-            continue
-
-        for page in banned_pages:
-            if not page:
-                # remove all from that domain
-                to_be_ranked_by_domain.pop(domain)
-            else:
-                def condition(e: List):
-                    return e[0] == page
-                try:
-                   i = next(i for i, e in enumerate(to_be_ranked) if condition(e))
-                   to_be_ranked.pop(i)
-                except:
-                    continue
-                # to_be_ranked_by_domain[domain] = list(filter(f, to_be_ranked))
-
-
-def rank_by_domain(to_be_ranked_by_domain: Dict[str, List]) -> Dict[str, Rank]:
-    ranks = {}
-    for domain in tqdm(to_be_ranked_by_domain.keys()):
-        r = Rank(name=domain, maxlen=defaults.rank_size)
-        pages = to_be_ranked_by_domain[domain]
-
-        for page in pages:
-            name = page[0]
-            score = page[1]
-            r.push(content=name, score=score)
-
-        ranks[domain] = r.tuples
-
-    return ranks
-
-
+# Compute Rank Task
 class ComputeRankTask(luigi.Task):
+    """"""
 
     # date hour parameter
     date_hour = luigi.DateHourParameter()
@@ -103,31 +31,67 @@ class ComputeRankTask(luigi.Task):
 
     # run
     def run(self):
+        # check existence
         if self.output().exists():
             return
 
-        bl = BlackList()
-
+        # dict to store the ranks per domain
         ranks = {}
 
+        # open the input file (txt)
         with self.input().open('r') as f:
+
+            # in case of test, wrap the file with tqdm ('progressbar')
             iter = tqdm(f) if __name__ == '__main__' else f
+
+            # iterate through the lines
             for line in iter:
+
+                # get the infos in the line
                 domain, page, pageviews, _ = tuple(line.split())
 
+                # convert the pageviews
+                pageviews = int(pageviews)
+
+                # get the domain's rank if existent
                 rank = ranks.get(domain, None)
 
+                # check if it is ok
                 if rank is None:
-                    rank = Rank(name=domain, maxlen=defaults.augmented_rank_size, validate_fun=None)
+                    # if not, create one
+                    rank = Rank(name=domain, maxlen=defaults.augmented_rank_size)
 
+                    # and insert it in the dict
+                    ranks[domain] = rank
+
+                # push the content to it
                 rank.push(page, pageviews)
-        pass
 
+        # get a black list
+        bl = BlackList()
+
+        # post validate the ranks
+        for domain, rank in ranks.items():
+
+            # the validation func
+            def validate(content):
+                # the black list (of this domain) must not have the content
+                return bl.doesnt_have(domain, content)
+
+            # post validate the contents
+            rank.post_validate(validate_fun=validate)
+
+            # shorten the ranks to the real size
+            rank.resize(defaults.rank_size)
+
+        # dump the ranks in the output
+        with open(self.output().path, 'wb') as f:
+            pickle.dump(ranks, f)
 
     # output
     def output(self) -> Target:
         # filename
-        filename = self.date_hour.strftime(defaults.date_hour_format)
+        filename = self.date_hour.strftime(defaults.date_hour_format + '.pickle')
 
         # abs path
         abspath = env.temp_rank_pickle_abs_path + filename
@@ -137,6 +101,7 @@ class ComputeRankTask(luigi.Task):
         return target
 
 
+# test
 def _test():
     # date-hour's
     dt1 = datetime(year=2017, month=3, day=1, hour=0)
@@ -153,6 +118,7 @@ def _test():
     luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=True)
 
 
+# run the test
 if __name__ == '__main__':
     _test()
     pass

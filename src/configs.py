@@ -78,6 +78,7 @@ class Defaults:
 
     # rank size
     rank_size = 25
-    # augmented rank size (todo explain)
-    augmented_rank_size = 50
+
+    # augmented rank size (size used to build the ranks, to compensate the fact that it is filtered later)
+    augmented_rank_size = 30
 
