@@ -94,3 +94,6 @@ class Options:
     # filter main page
     filter_main_page = True
 
+    # luigi scheduler
+    use_local_scheduler = False
+
