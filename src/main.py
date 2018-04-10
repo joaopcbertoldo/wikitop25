@@ -22,10 +22,6 @@ def main(ns):
     elif ns.command == 'range':
         tasks = create_tasks(ns.dt_range)
 
-    print(tasks)
-
-    quit()
-
     # build
     luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=opt.use_local_scheduler)
 
