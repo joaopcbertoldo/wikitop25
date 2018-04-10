@@ -14,10 +14,17 @@ from src.workflow import create_tasks
 setup_temp()
 
 
-def main(args):
-    dateh = datetime(2016, 10, 10, 20)
+def main(ns):
 
-    tasks = create_tasks([dateh])
+    if ns.command == 'single':
+        tasks = create_tasks([ns.dt])
+
+    elif ns.command == 'range':
+        tasks = create_tasks(ns.dt_range)
+
+    print(tasks)
+
+    quit()
 
     # build
     luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=opt.use_local_scheduler)
