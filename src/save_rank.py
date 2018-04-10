@@ -34,7 +34,7 @@ class SaveRankTask(luigi.Task):
         if self.output().exists():
             return
 
-        # load the ranks from the input
+        # _load the ranks from the input
         with open(self.input().path, 'rb') as f:
             ranks: Dict[str, Rank] = pickle.load(f)
 

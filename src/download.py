@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 download.py
-    Defines the DownloadTask and auxiliary stuff for it.
+    Defines the DownloadTask (first in the workflow) and auxiliary stuff for it.
     DownloadTask: downloads the gz file from wikimedia (via http request), decompresses it, decodes it in utf-8
                   and saves the result in a txt file.
 """
@@ -86,7 +86,7 @@ class DownloadTask(luigi.Task):
             # write to it
             f.write(txt)
 
-    # output - local target
+    # output - local target (txt)
     def output(self) -> Target:
         # abspath
         abspath = self._filemeta.abspath

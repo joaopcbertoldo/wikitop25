@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-
+compute_rank.py
+    Defines the ComputeRankTask (second in the workflow).
+    ComputeRankTask : gets the pageviews, compute the ranks per domain eliminating black listed pages and
+                      saves the result in a pickle file.
 """
 
 from datetime import datetime
@@ -21,18 +24,24 @@ from src.download import DownloadTask
 
 # Compute Rank Task
 class ComputeRankTask(luigi.Task):
-    """"""
+    """
+    Gets a txt with all the pageviews, create a Rank object for each domain, push all the pages/pageviews
+    to their respective ranks, than filters the ranks to eliminate blacklisted pages and saves in a pickle file
+    as a dictionary of Rank objects per domain (as key).
+    To avoid having a rank shorter than it should (because of eliminated pages), ranks a created with a bigger
+    size first and then shortened to the correct size.
+    """
 
     # date hour parameter
     date_hour = luigi.DateHourParameter()
 
-    # requires
+    # requires the DownloadTask
     def requires(self):
         return DownloadTask(self.date_hour)
 
     # run
     def run(self):
-        # check existence
+        # check existence - for test purposes
         if self.output().exists():
             return
 
@@ -81,32 +90,31 @@ class ComputeRankTask(luigi.Task):
         # post validate the ranks
         for domain, rank in ranks.items():
 
-            # the validation func
-            # in case the main page must be filtered
+            # validation func - filtering Main_Page
             if opt.filter_main_page:
                 # func
                 def validate(content):
-                    # the black list (of this domain) must not have the content
+                    # the black list (of this domain) must not have the content and cannot be 'Main_Page'
                     return bl.doesnt_have(domain, content) and content != 'Main_Page'
 
-            # in case it shouldnt
+            # validation func - without filtering Main_Page
             else:
                 # func
                 def validate(content):
                     # the black list (of this domain) must not have the content
                     return bl.doesnt_have(domain, content)
 
-            # post validate the contents
+            # post validate the contents (to filter the black listed pages)
             rank.post_validate(validate_fun=validate)
 
             # shorten the ranks to the real size
             rank.resize(defaults.rank_size)
 
-        # dump the ranks in the output
+        # dump the ranks dictionary in the output file
         with open(self.output().path, 'wb') as f:
             pickle.dump(ranks, f)
 
-    # output
+    # output - local target (binary, pickle)
     def output(self) -> Target:
         # filename
         filename = self.date_hour.strftime(defaults.date_hour_format + '.pickle')
@@ -114,7 +122,7 @@ class ComputeRankTask(luigi.Task):
         # abs path
         abspath = env.temp_rank_pickle_abs_path + filename
 
-        # target
+        # target - binary
         target = luigi.LocalTarget(abspath, format=format.Nop)
         return target
 
