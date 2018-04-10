@@ -88,9 +88,15 @@ class CleanUpTask(luigi.Task):
         if os.path.isfile(picke_abspath):
             os.remove(picke_abspath)
 
+        # dummy file
+        open(picke_abspath, 'a').close()
+
         # download
         if os.path.isfile(download_abspath):
             os.remove(download_abspath)
+
+        # dummy file
+        open(download_abspath, 'a').close()
 
 
 # test

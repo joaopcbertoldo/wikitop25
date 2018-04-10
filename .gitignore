@@ -6,7 +6,7 @@ src/black_list/blacklist_domains_and_pages
 temp/
 
 # ranks files
-ranks/
+#ranks/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
