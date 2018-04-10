@@ -113,7 +113,7 @@ def _test_save():
 
 def _test_cleanup():
     # date-hour's
-    dt1 = datetime(year=2017, month=3, day=18, hour=12)
+    dt1 = datetime(year=2017, month=3, day=18, hour=19)
 
     # tasks
     t1 = CleanUpTask(dt1)
@@ -122,7 +122,8 @@ def _test_cleanup():
     tasks = [t1]
 
     # build
-    luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=True)
+    luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=False)
+    #luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=True)
 
 
 # run the test

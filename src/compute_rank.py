@@ -48,11 +48,18 @@ class ComputeRankTask(luigi.Task):
             # iterate through the lines
             for line in iter:
 
-                # get the infos in the line
-                domain, page, pageviews, _ = tuple(line.split())
+                try:
+                    # get the infos in the line
+                    pieces = line.split()
+                    domain = pieces[1]
+                    page = pieces[1]
+                    pageviews = pieces[2]
 
-                # convert the pageviews
-                pageviews = int(pageviews)
+                    # convert the pageviews
+                    pageviews = int(pageviews)
+
+                except:
+                    continue
 
                 # get the domain's rank if existent
                 rank = ranks.get(domain, None)
