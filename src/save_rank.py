@@ -65,7 +65,7 @@ class SaveRankTask(luigi.Task):
 
 
 # Clean Temp Files Task
-class CleanTempFilesTask(luigi.Task):
+class CleanUpTask(luigi.Task):
 
     # date hour parameter
     date_hour = luigi.DateHourParameter()
@@ -82,8 +82,15 @@ class CleanTempFilesTask(luigi.Task):
         # path to the pickle file
         download_abspath = self.requires().requires().input().path
 
-        os.remove(picke_abspath)
-        os.remove(download_abspath)
+        # remove them
+
+        # pickle
+        if os.path.isfile(picke_abspath):
+            os.remove(picke_abspath)
+
+        # download
+        if os.path.isfile(download_abspath):
+            os.remove(download_abspath)
 
 
 # test
@@ -109,7 +116,7 @@ def _test_cleanup():
     dt1 = datetime(year=2017, month=3, day=18, hour=12)
 
     # tasks
-    t1 = CleanTempFilesTask(dt1)
+    t1 = CleanUpTask(dt1)
 
     # gather tasks
     tasks = [t1]
