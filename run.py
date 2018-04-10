@@ -13,6 +13,8 @@ from src.configs import Defaults as defaults
 from src.main import main
 
 
+WIKIPEDIA_EARLIEST_PAGEVIEWS = datetime(2015, 5, 1, 1)
+
 # ------------------------------------------------- aux ----------------------------------------------------------------
 
 # validate the date input
@@ -84,6 +86,14 @@ def single_post_parsing(ns):
     # datetime
     ns.dt = datetime.combine(ns.date, time(hour=ns.hour))
 
+    # dt after wikipedia's earliest pageviews
+    if not ns.dt >= WIKIPEDIA_EARLIEST_PAGEVIEWS:
+        limitstr = WIKIPEDIA_EARLIEST_PAGEVIEWS.strftime(defaults.date_hour_format_h)
+        dtstr = ns.dt.strftime(defaults.date_hour_format_h)
+        err_msg = f"The instant to process must be after or equal to the the earliest available info ({limitstr}). "
+        err_msg += f"\n\tGiven: {dtstr}"
+        single_parser.error(err_msg)
+
     # now
     dtnow = datetime.now()
 
@@ -93,7 +103,7 @@ def single_post_parsing(ns):
         dtstr = ns.dt.strftime(defaults.date_hour_format_h)
         err_msg = f"The instant to process must be before or equal to the current time ({nowstr}). "
         err_msg += f"\n\tGiven: {dtstr}"
-        range_parser.error(err_msg)
+        single_parser.error(err_msg)
 
 
 # -------------------------------------------- range of dates parser ---------------------------------------------------
@@ -156,6 +166,14 @@ def range_post_parsing(ns):
         err_msg = f"The end must be before or equal to the current time ({nowstr}). "
         err_msg += "\n\tGiven: \n"
         err_msg += f"\t\tend = {dtNstr}"
+        range_parser.error(err_msg)
+
+    # beginning after wikipedia's earliest pageviews
+    if not ns.dt0 >= WIKIPEDIA_EARLIEST_PAGEVIEWS:
+        limitstr = WIKIPEDIA_EARLIEST_PAGEVIEWS.strftime(defaults.date_hour_format_h)
+        dtstr = ns.dt.strftime(defaults.date_hour_format_h)
+        err_msg = f"The instant to process must be after or equal to the the earliest available info ({limitstr}). "
+        err_msg += f"\n\tGiven: {dtstr}"
         range_parser.error(err_msg)
 
     # range of datetimes to process
