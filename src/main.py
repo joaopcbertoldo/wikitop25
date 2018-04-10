@@ -28,4 +28,21 @@ def main(ns):
 
 if __name__ == '__main__':
     print('testing...')
-    main(None)
+    from random import randint as ri
+    from datetime import datetime
+
+    # create a random date and hour
+    datehour = datetime(
+        year=ri(2016, 2018),
+        month=ri(1, 12),
+        day=ri(1, 28),
+        hour=ri(0, 23)
+    )
+
+    # namespace
+    class Ns:
+        comamnd = 'single'
+        dt = datehour
+
+    # call the main
+    main(Ns())

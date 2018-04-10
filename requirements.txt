@@ -4,6 +4,7 @@ docutils==0.14
 idna==2.6
 lockfile==0.12.2
 luigi==2.7.3
+numpy==1.14.2
 python-daemon==2.1.2
 requests==2.18.4
 tornado==4.5.3
