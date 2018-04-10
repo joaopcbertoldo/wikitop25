@@ -40,6 +40,9 @@ class Environment:
     # abspath of temp\rank_pickle folder
     temp_rank_pickle_abs_path = temp_abs_path + r'rank_pickle\\'
 
+    # abspath of ranks folder
+    ranks_abs_path = wikitop25_abs_path + r'ranks\\'
+
     # black list folder
     black_list_folder = wikitop25_abs_path + r'src\\black_list\\'
 
@@ -81,4 +84,8 @@ class Defaults:
 
     # augmented rank size (size used to build the ranks, to compensate the fact that it is filtered later)
     augmented_rank_size = 30
+
+    # json indentation
+    json_indentation = 4
+
 

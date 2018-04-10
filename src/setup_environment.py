@@ -34,6 +34,9 @@ def setup_temp():
     # temp rank pickle
     _ensure_folder(env.temp_rank_pickle_abs_path)
 
+    # ranks folder
+    _ensure_folder(env.ranks_abs_path)
+
 
 # test
 if __name__ == '__main__':

@@ -3,7 +3,7 @@
 
 """
 
-from typing import List, Tuple, Callable, Union
+from typing import List, Dict, Callable, Union
 from numbers import Number
 
 
@@ -68,7 +68,7 @@ class Rank:
     # str
     def __str__(self):
         strs = ['\t' + str(ri) for ri in self.rank_items]
-        strs.insert(0, f'Rank(name: {self._name}, len: {len(self)} (max: {self._maxlen}))')
+        strs.insert(0, f'Rank(name: {self.name}, len: {len(self)} (max: {self._maxlen}))')
         ret = '\n'.join(strs)
         return ret
 
@@ -204,31 +204,17 @@ class Rank:
     def name(self) -> str:
         return self._name
 
-    # contents
-    @property
-    def contents(self) -> List:
-        self._clean()
-        ret = [i.content for i in self._list]
-        return ret
-
-    # scores
-    @property
-    def scores(self) -> List:
-        self._clean()
-        ret = [i.score for i in self._list]
-        return ret
-
     # rank items
     @property
     def rank_items(self) -> List[RankItem]:
         self._clean()
         return self._list
 
-    # tuples
+    # dictionized items
     @property
-    def tuples(self) -> List[Tuple]:
+    def dictionized_items(self) -> List[Dict]:
         self._clean()
-        ret = [(i.content, i.score) for i in self._list]
+        ret = [{'ranked_pos': i, 'values': item.content, 'score': item.score} for i, item in enumerate(self._list)]
         return ret
 
 
