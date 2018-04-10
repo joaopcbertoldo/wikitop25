@@ -14,7 +14,7 @@ from src.save_rank import SaveRankTask, CleanUpTask
 buffer = []
 
 
-def input(date_hours: List[datetime]):
+def create_main_task(date_hours: List[datetime]) -> luigi.Task:
 
     # iterate through the date hours given
     for dh in date_hours:
@@ -33,11 +33,14 @@ def input(date_hours: List[datetime]):
         # add it to the buffer
         buffer.append(cutask)
 
+    return RunAll()
+
 
 class RunAll(luigi.Task):
     """ Dummy task that triggers execution of a other tasks."""
 
     # requires
     def requires(self):
+        global buffer
         for task in buffer:
             yield task
