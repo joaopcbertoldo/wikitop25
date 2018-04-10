@@ -34,8 +34,9 @@ class SaveRankTask(luigi.Task):
             return
 
         # load the ranks from the input
-        with open(self.input().path, 'wb') as f:
-            ranks: Dict[str, Rank] = pickle.load(f)
+        with open(self.input().path, 'rb') as f:
+            ranks = pickle.load(f)
+            #ranks: Dict[str, Rank] = pickle.load(f)
 
         # for each domain
         for domain, rank in ranks.items():
@@ -47,7 +48,7 @@ class SaveRankTask(luigi.Task):
             ranks[domain] = dictionized_items
 
         # write it to the json
-        with self.output().opent('w') as f:
+        with self.output().open('w') as f:
             json.dump(ranks, f, indent=defaults.json_indentation)
 
     # output

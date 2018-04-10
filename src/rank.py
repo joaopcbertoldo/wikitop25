@@ -214,7 +214,7 @@ class Rank:
     @property
     def dictionized_items(self) -> List[Dict]:
         self._clean()
-        ret = [{'ranked_pos': i, 'values': item.content, 'score': item.score} for i, item in enumerate(self._list)]
+        ret = [{'ranked_pos': i, 'values': item.contents, 'score': item.score} for i, item in enumerate(self._list)]
         return ret
 
 
