@@ -40,6 +40,7 @@ class ComputeRankTask(luigi.Task):
         return DownloadTask(self.date_hour)
 
     # run
+    @property
     def run(self):
         # check existence - for test purposes
         if self.output().exists():
@@ -67,7 +68,7 @@ class ComputeRankTask(luigi.Task):
                     # convert the pageviews
                     pageviews = int(pageviews)
 
-                except:
+                except Exception:
                     continue
 
                 # get the domain's rank if existent

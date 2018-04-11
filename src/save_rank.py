@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-
+save_rank.py
+    Defines tasks SaveRankTask (third one) and CleanUpTask (fourth and last one).
+        SaveRankTask:
+            Gets a computed rank, transforms it in a json and save it.
+        CleanUpTask:
+            Deletes temporary files from the intermediate tasks (Download and ComputeRank).
 """
 import os
 import json
@@ -20,21 +25,25 @@ from src.compute_rank import ComputeRankTask
 
 # Save Rank Task
 class SaveRankTask(luigi.Task):
+    """
+    Gets the computed ranks as Rank objects, transform them in a list of items (for each domain) where each
+    item is transformed in a dictionary, than that is outputted as a json in a txt file.
+    """
 
     # date hour parameter
     date_hour = luigi.DateHourParameter()
 
-    # requires
+    # requires ComputeRankTask
     def requires(self):
         return ComputeRankTask(self.date_hour)
 
     # run
     def run(self):
-        # check existence
+        # check existence - for test purposes
         if self.output().exists():
             return
 
-        # _load the ranks from the input
+        # load the ranks from the input (the binary file)
         with open(self.input().path, 'rb') as f:
             ranks: Dict[str, Rank] = pickle.load(f)
 
@@ -47,11 +56,11 @@ class SaveRankTask(luigi.Task):
             # replace the rank by them
             ranks[domain] = dictionized_items
 
-        # write it to the json
+        # write it to the json file
         with self.output().open('w') as f:
             json.dump(ranks, f, indent=defaults.json_indentation)
 
-    # output
+    # output - local target (txt, json)
     def output(self) -> Target:
         # filename
         filename = self.date_hour.strftime(defaults.date_hour_format + '.json')
@@ -59,39 +68,43 @@ class SaveRankTask(luigi.Task):
         # abs path
         abspath = env.ranks_abs_path + filename
 
-        # target
+        # target (utf8 is important!!!!)
         target = luigi.LocalTarget(abspath, format=format.UTF8)
         return target
 
 
 # Clean Temp Files Task
 class CleanUpTask(luigi.Task):
+    """
+    Deletes the temporary files from other tasks and replaces them with dummy files.
+    dummy file --> empty file such that created tasks recognize that the task has been run (also human debugable).
+    """
 
     # date hour parameter
     date_hour = luigi.DateHourParameter()
 
-    # requires
+    # requires SaveRankTask
     def requires(self):
         return SaveRankTask(self.date_hour)
 
     # run
     def run(self):
-        # path to the pickle file
-        picke_abspath = self.requires().input().path
+        # path to the pickle file (from compute_rank)
+        pickle_abspath = self.requires().input().path
 
-        # path to the pickle file
+        # path to the download's file
         download_abspath = self.requires().requires().input().path
 
-        # remove them
+        # delete these files and let dummy files in their places
 
-        # pickle
-        if os.path.isfile(picke_abspath):
-            os.remove(picke_abspath)
+        # delete pickle file (from compute_rank)
+        if os.path.isfile(pickle_abspath):
+            os.remove(pickle_abspath)
 
         # dummy file
-        open(picke_abspath, 'a').close()
+        open(pickle_abspath, 'a').close()
 
-        # download
+        # delete download's file
         if os.path.isfile(download_abspath):
             os.remove(download_abspath)
 
@@ -129,7 +142,6 @@ def _test_cleanup():
 
     # build
     luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=False)
-    #luigi.build(tasks, worker_scheduler_factory=None, local_scheduler=True)
 
 
 # run the test
