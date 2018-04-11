@@ -1,5 +1,6 @@
 # wikitop25
 Application that computes the top 25 pages for each sub-domain in Wikipedia for a given date and hour.
+
 Instructions on how to use it: see section 2.1.
 
 **Author:** João P C Bertoldo
@@ -48,7 +49,9 @@ $ python run.py -h
 
 ##### 2.2) Design
 The app was built using the luigi framework.
+
 The script run.py validates the inputs and provides command line interface
+
 There are two commands:
 - `single` runs it for only one date-hour - default is the hour before the current hour (as the current might not yet be available)
 
@@ -58,6 +61,7 @@ Results are saved in the ``wikitop25/ranks`` folder as a .json (text file encode
 
 ###### 2.2.1) Considerations and suppositions
 Things marked with * can be altered in ``src/configs``
+
 1) the **Main_Page** is excluded from the ranking *
 2) a missing page name in the black list file is considered as if the whole domain is black listed
 3) results and intermidiate files are stored locally in the project's folder *
@@ -85,7 +89,9 @@ DonwloadTask --> ComputeRankTask --> SaveRankTask --> CleanUpTask
     ***when executed for ther 1st time:***  -> create necessary folders (temp, ranks, ...)
 
 2) For each input (datetime), check if its rank has already been computed.
+
 If yes, skip it. If not, create a Task to do it.
+
 Send the tasks to luigi's scheduler.
 
 3) Download the .gz file from wikimedia, decompress it, decode it and write everything in a .txt file.
@@ -93,6 +99,7 @@ Send the tasks to luigi's scheduler.
 4) Build a Rank object for each domain then, reading line by line, get the domain, page name and pageviews and push page/pageviews in the correct Rank (see the section '****Rank logic****').
 
 5) For each Rank, filter the pages by eliminating those in the black list.
+
     ****when loading the black list for the first time***
         - read the ``.txt`` file
         - process it (creating a dict)
@@ -107,12 +114,14 @@ Send the tasks to luigi's scheduler.
 ###### 2.2.4) Rank logic
 
 ###### 2.2.5) JSON structure
+
 Key-Value:
-|Key|Value|
-|----|----|
-|``ranked_pos`` | is the position in the rank (from 0 to 24) |
-|``score`` | is the number of page views |
-|``values`` | is a list of strings with the names of the pages in that rank position |
+
+``ranked_pos`` is the position in the rank (from 0 to 24) 
+
+``score``  is the number of page views 
+
+``values``  is a list of strings with the names of the pages in that rank position 
 
 ```javascript
 {
@@ -149,52 +158,73 @@ Key-Value:
     - divide the results in two parts (and tasks as well) because there are several domains a lot less voluminous and less important than others, so I'd separate those that are rather more important and give them priority, which would improve performance
 
 2) **Changes to run automatically**:
+
 It should be relatively easy, I would create an infinite routine that would schedule new tasks every hour by calling the `main`.
+
 It would be interesting to create control commands to operate such routine.
+
 For safety, I would ensure that there is a proper way to pause/resume/stop the app, which could be necessary for versioning it.
+
 The logging/alert functionalities would become particularly important to keep basic track of what happens.
 
 3) **Testing the app**
 I would create unity tests for the different encapsulated parts of the app.
+
 Overall tests that I would implement*:
-    - DownloadTask
-        - tests related to internet connection/http errors (as 404, for example)
-        - check proper behavior in case of corrupted files
-    - ComputeRankTask
-        - test behavior cases of missing values
-        - (ideally) run several examples with the black list filtering before computing the rank (which garantees a correct rank) and compare it to the used strategy --> this should estimate how often this strategy could be inconsistent
-    - SaveTask
-        - test that the result json is correctly loaded
-    - BlackList
-        - test the loading of the txt and pickle file
-        - test behavior in case of missing values
-        - check the `has()` and `doesnt_have()` functions with known examples
-    - `rank.py` module
-        - `RankItem`: test logic with scores and manament of inclusion/deletion of a content
-        - `Rank`: nsure that the logic of the algorithm works well (mainly in cases that items are eliminated during the filtering)
+- DownloadTask
+    - tests related to internet connection/http errors (as 404, for example)
+    - check proper behavior in case of corrupted files
+- ComputeRankTask
+    - test behavior cases of missing values
+    - (ideally) run several examples with the black list filtering before computing the rank (which garantees a correct rank) and compare it to the used strategy --> this should estimate how often this strategy could be inconsistent
+- SaveTask
+    - test that the result json is correctly loaded
+- BlackList
+    - test the loading of the txt and pickle file
+    - test behavior in case of missing values
+    - check the `has()` and `doesnt_have()` functions with known examples
+- `rank.py` module
+    - `RankItem`: test logic with scores and manament of inclusion/deletion of a content
+    - `Rank`: nsure that the logic of the algorithm works well (mainly in cases that items are eliminated during the filtering)
 
 \* some of these are already done in the modules them selves when run as __main\__
 
 4) **Design changes**
-    - remove the input validations from `run()` and place it in a new module that would be called by `main()`
+- remove the input validations from `run()` and place it in a new module that would be called by `main()`
+
     *Reason*: this would make the validations reusable in case that another interface or script would trigger the app
-    - decompose the `CleanUpTask` into a clean up for each task. This could be done with a task that takes another task as parameter and creates the dependency by itself or with an abstract task.
+    
+- decompose the `CleanUpTask` into a clean up for each task. This could be done with a task that takes another task as parameter and creates the dependency by itself or with an abstract task.
+    
     *Reason*:  This would reduce disk usage by removing temporary stuff as soon as possible.
-    - (according to performance) change the black list implementation to
-        - read from a stream (thus not needing to load it completely each time)
-        - store it in a database
-        - use regex to check if a page is in it
-    - (if the black list filtering improves enough in speed) do the filtering before creating the rank
+    
+- (according to performance) change the black list implementation to
+    - read from a stream (thus not needing to load it completely each time)
+    - store it in a database
+    - use regex to check if a page is in it
+    
+- (if the black list filtering improves enough in speed) do the filtering before creating the rank
+
     *Reason*: this would rather ensure the consistency of the ranks
-    - in rank, rather use an ordered list
+
+- in rank, rather use an ordered list
+
     *Reason*: which could simplify the implementation to manage the ordering
-    - build the rank directly with the correct size then, when doing the filtering, only in case that the rank gets shorter, go back to the input and get a new item
+   
+- build the rank directly with the correct size then, when doing the filtering, only in case that the rank gets shorter, go back to the input and get a new item
+
     *Reason*: this could improve performance by consulting the black list fewer times and would ensure consistency.
-    - (if more options/commands are added) manage the parser creation in a separate package with individual/grouped parsers per module
+    
+- (if more options/commands are added) manage the parser creation in a separate package with individual/grouped parsers per module
+
     *Reason*: better organized and better reuse of code/text
-    - encapsulate the filtering function in some sort of callable that could be an option when building the task/workflow
+    
+- encapsulate the filtering function in some sort of callable that could be an option when building the task/workflow
+
     *Reason*: more flexible app
-    - for the output formatation, encapsulate the behavior and make it changeable (as with a callable)
+   
+- for the output formatation, encapsulate the behavior and make it changeable (as with a callable)
+
     *Reason*: easier to personalize the output as needed
 
 5) **Framework** luigi was used (see ****Workflow design**** in section ****2.2.2****).
