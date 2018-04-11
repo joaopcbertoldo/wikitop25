@@ -265,6 +265,10 @@ class Rank:
                     # remove it
                     ri.remove_content(c)
 
+            # remove the item ended up empty and remove it if so
+            if len(ri.contents) == 0:
+                self._list.remove(ri)
+
     def resize(self, newmaxlen: int):
         """Change the maxlen of the rank."""
         self._maxlen = newmaxlen
