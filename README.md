@@ -46,7 +46,71 @@ $ python run.py range -h
 ```
 
 ##### 2.2) Design
+The app was built using the luigi framework (to manage the workflow).
 
+There are two commands:
+- `single`: run it for only one date-hour - default is the hour before the current hour of the call (as the current might not yet be available)
+- `range`: run it for each date-hour between between the beginnig and end (included) - no default
+
+Results are saved in the ``wikitop25/ranks`` folder as a .json (text file encoded with utf-8).
+
+###### 2.2.) Considerations and suppositions
+- the **Main_Page** is excluded from the ranking (this can be altered in ``src/configs``)
+- if a line in the original black list file does not have a page name, the whole domain is considered black listed
+- results and intermidiate files are stored locally in the project's folder (this can be altered in ``src/configs``)
+- ranks are 0-indexed (from 0 to 24)
+- luigi's scheduler is not local by default (this can be altered in ``src/configs``)
+- tasks are paremetered by datetime objects (date-hour in luigi)
+- run.py validates the inputs and provides command line interface
+- all pages with equal number of pageviews are kept in the rank at the same rank position
+- ranking ordered is done by pushing items into the rank and ordering it for each new page
+
+###### 2.2.) Workflow design
+- Tasks dependency:
+``
+DonwloadTask --> ComputeRankTask --> SaveRankTask --> CleanUpTask
+``
+
+- Targets:
+    - ``DonwloadTask --> LocalTarget (.txt)``
+    - ``ComputeRankTask --> LocalTarget (binary from pickle)``
+    - ``SaveRankTask --> LocalTarget (.json)``
+    - ``CleanUpTask --> nothing``
+
+###### 2.2.) General procedure
+1) Inputs are interpreted and validated.
+** in the end of this, the most important are the `command` argument and the range of datetime objects that specify the date and hour to run.
+
+* ***when executed for ther 1st time:***
+    * create necessary folders
+    * when loading the black list, read the ``.txt`` file, process it and save a pickle file to be used later
+
+2) For each input (datetime), check if the Rank of that date-hour has already been computed. If yes, skip it, if not, create a Task to do it.
+
+3) HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+###### 2.2.) Output (json) structure
+``ranked_pos`` is the position in the rank (from 0 to 24) .
+``score`` is the number of page views
+``values`` is a list of strings with the names of the pages in that rank position
+
+```json
+{
+    domain1: [
+        {
+            ranked_pos: int,
+            score: int,
+            values: [page1, page2, ..., pageN]
+        },
+        {...},
+        ...
+        {...}
+    ],
+    domain2: [...],
+    ...
+    domainN: [...]
+}
+```
 
 ##### 2.3) Answers
 1) I would add:
@@ -67,6 +131,7 @@ $ python run.py range -h
 
 2) To run it automatically it should be relatively easy, it would be necessary to create an infinite routine that would schedule new tasks every hour by calling the `main`. It would be interesting to create control commands to operate such routine.
 For safety, there could be mechanisms checking for the memory usage and disk space (as files are stored every hour). I would also create a propre process to stop/resume the app, which could be necessary for versioning it.
+
 The logging/alert functionalities would become particularly important to keep basic track of what happens, some the should be implemented.
 
 3) I would creat unity tests for the different encapsulated parts of the app. Overall of what I would do**:
@@ -97,15 +162,7 @@ The logging/alert functionalities would become particularly important to keep ba
     - in rank, rather use an ordered list (which could simplify the implementation to manage the ordering)
     - build the rank directly with the correct size then, when doing the filtering, only in case that the rank gets shorter because of eliminated items, go back to the input and get a new item
     - (if more options/commands are added) manage the parser creation in a separate package with individual/grouped parsers per module
+    - encapsulate the filtering function in some sort of callable that could be an option when building the task/workflow
+    - for the output formatation, encapsulate the behavior and make changeable (as a callable), which would make it easier to personalize it as needed
 
-5) luigi was used
-- Tasks dependency:
-``
-DonwloadTask --> ComputeRankTask --> SaveRankTask --> CleanUpTask
-``
-
-- Targets:
-    - ``DonwloadTask --> LocalTarget (.txt)``
-    - ``ComputeRankTask --> LocalTarget (binary from pickle)``
-    - ``SaveRankTask --> LocalTarget (.json)``
-    - ``CleanUpTask --> nothing``
+5) luigi was used (see ****Workflow design**** in section ****2.2****).
