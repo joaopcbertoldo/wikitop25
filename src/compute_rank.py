@@ -40,7 +40,6 @@ class ComputeRankTask(luigi.Task):
         return DownloadTask(self.date_hour)
 
     # run
-    @property
     def run(self):
         # check existence - for test purposes
         if self.output().exists():

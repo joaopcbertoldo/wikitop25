@@ -44,6 +44,8 @@ if __name__ == '__main__':
         hour=ri(0, 23)
     )
 
+    print('date:', str(datehour))
+
     # namespace
     class Ns:
         command = 'single'
