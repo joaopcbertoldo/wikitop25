@@ -39,10 +39,12 @@ def _setup_folders():
 
 
 def run():
-    """Run every necessary setup."""
+    """
+    Run every necessary setup.
 
-    # for now there is only one function thing to be called, but, as the application changes, there could be other
-    # things, so having one only function to be called keeps the main unchanged.
+    For now there is only one function thing to be called, but, as the application changes, there could be other
+    things, so having one only function to be called keeps the main unchanged.
+    """
 
     # folders
     _setup_folders()
